@@ -1,5 +1,10 @@
 # react-typeahead
 
+# Sppro updates
+* The string refs were removed to stop the React warnings.
+* Unsafe link removed
+* fixed options, which were not showing again once selected
+
 > A typeahead/autocomplete component for React
 
 react-typeahead is a javascript library that provides a react-based
