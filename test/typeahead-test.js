@@ -8,9 +8,10 @@ var TypeaheadOption = require('../src/typeahead/option');
 var TypeaheadSelector = require('../src/typeahead/selector');
 var Keyevent = require('../src/keyevent');
 var TestUtils = require('react-addons-test-utils');
+var createReactClass = require('create-react-class');
 
 function simulateTextInput(component, value) {
-  var node = component._entry;
+  var node = component.refs.entry;
   node.value = value;
   TestUtils.Simulate.change(node);
   return TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
@@ -75,7 +76,7 @@ describe('Typeahead Component', function() {
       it('down arrow + return selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var secondItem = ReactDOM.findDOMNode(results[1]).innerText;
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
@@ -85,7 +86,7 @@ describe('Typeahead Component', function() {
       it('up arrow + return navigates and selects an option', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = ReactDOM.findDOMNode(results[0]).innerText;
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
@@ -96,7 +97,7 @@ describe('Typeahead Component', function() {
       it('escape clears selection', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = ReactDOM.findDOMNode(results[0]);
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         assert.ok(firstItem.classList.contains('hover'));
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_ESCAPE });
@@ -106,7 +107,7 @@ describe('Typeahead Component', function() {
       it('tab to choose first item', function() {
         var results = simulateTextInput(this.component, 'o');
         var itemText = ReactDOM.findDOMNode(results[0]).innerText;
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal(node.value, itemText);
       });
@@ -114,7 +115,7 @@ describe('Typeahead Component', function() {
       it('tab to selected current item', function() {
         var results = simulateTextInput(this.component, 'o');
         var itemText = ReactDOM.findDOMNode(results[1]).innerText;
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
@@ -124,17 +125,38 @@ describe('Typeahead Component', function() {
       it('tab on no selection should not be undefined', function() {
         var results = simulateTextInput(this.component, 'oz');
         assert(results.length == 0);
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
         assert.equal("oz", node.value);
       });
 
       it('should set hover', function() {
         var results = simulateTextInput(this.component, 'o');
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         assert.equal(true, results[1].props.hover);
+      });
+    });
+
+    describe('mouse controls', function() {
+      // as of React 15.5.4 this does not work
+      xit('mouse click selects an option (click event)', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var secondItem = ReactDOM.findDOMNode(results[1]);
+        var secondItemValue = secondItem.innerText;
+        var node = this.component.refs.entry;
+        TestUtils.Simulate.click(secondItem);
+        assert.equal(node.value, secondItemValue);
+      });
+      // but this one works
+      it('mouse click selects an option (mouseDown event)', function() {
+        var results = simulateTextInput(this.component, 'o');
+        var secondItem = ReactDOM.findDOMNode(results[1]);
+        var secondItemValue = secondItem.innerText;
+        var node = this.component.refs.entry;
+        TestUtils.Simulate.mouseDown(secondItem);
+        assert.equal(node.value, secondItemValue);
       });
     });
 
@@ -146,7 +168,7 @@ describe('Typeahead Component', function() {
         this.sinon.restore();
       });
       it('focuses the typeahead', function() {
-        var node = ReactDOM.findDOMNode(this.component._entry);
+        var node = ReactDOM.findDOMNode(this.component.refs.entry);
         this.sinon.spy(node, 'focus');
         this.component.focus();
         assert.equal(node.focus.calledOnce, true);
@@ -254,7 +276,7 @@ describe('Typeahead Component', function() {
         />);
 
         var results = simulateTextInput(component, 'john');
-        var node = component._entry;
+        var node = component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_TAB });
 
         assert.equal(node.value, 'George');
@@ -278,7 +300,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should not display custom value if input length is less than entered', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "zz";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -287,7 +309,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should display custom value if input exceeds props.allowCustomValues', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -298,7 +320,7 @@ describe('Typeahead Component', function() {
       it('should call onOptionSelected when selecting from options', function() {
         var results = simulateTextInput(this.component, 'o');
         var firstItem = ReactDOM.findDOMNode(results[0]).innerText;
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_UP });
@@ -309,7 +331,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should call onOptionSelected when custom value is selected', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_DOWN });
@@ -319,7 +341,7 @@ describe('Typeahead Component', function() {
       })
 
       it('should add hover prop to customValue', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "ZZZ";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
@@ -350,7 +372,7 @@ describe('Typeahead Component', function() {
       });
 
       it('adds a custom class to the typeahead input', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         assert.isTrue(input.classList.contains('topcoat-text-input'));
       });
 
@@ -367,13 +389,13 @@ describe('Typeahead Component', function() {
 
       it('adds a custom class to the option anchor tags', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
-        var listAnchor = typeaheadOptions[1]._anchor;
+        var listAnchor = typeaheadOptions[1].refs.anchor;
         assert.isTrue(listAnchor.classList.contains('topcoat-list__link'));
       });
 
       it('adds a custom class to the list items when active', function() {
         var typeaheadOptions = TestUtils.scryRenderedComponentsWithType(this.component, TypeaheadOption);
-        var node = this.component._entry;
+        var node = this.component.refs.entry;
 
         TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
 
@@ -403,7 +425,7 @@ describe('Typeahead Component', function() {
           value={ 'John' }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         assert.equal(input.value, 'John');
       });
     });
@@ -418,7 +440,7 @@ describe('Typeahead Component', function() {
           }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         TestUtils.Simulate.keyDown(input, { keyCode: 87 });
       });
     });
@@ -433,7 +455,7 @@ describe('Typeahead Component', function() {
           }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         TestUtils.Simulate.keyPress(input, { keyCode: 87 });
       });
     });
@@ -448,7 +470,7 @@ describe('Typeahead Component', function() {
           }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         TestUtils.Simulate.keyUp(input, { keyCode: 87 });
       });
     });
@@ -460,7 +482,7 @@ describe('Typeahead Component', function() {
           inputProps={{ autoCorrect: 'off' }}
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         assert.equal(input.getAttribute('autoCorrect'), 'off');
       });
     });
@@ -474,7 +496,7 @@ describe('Typeahead Component', function() {
         simulateTextInput(component, 'o');
 
         assert.notOk(ReactDOM.findDOMNode(component).classList.contains("typeahead"));
-        assert.notOk(ReactDOM.findDOMNode(component._sel).classList.contains("typeahead-selector"));
+        assert.notOk(ReactDOM.findDOMNode(component.refs.sel).classList.contains("typeahead-selector"));
       });
     });
 
@@ -572,7 +594,7 @@ describe('Typeahead Component', function() {
           />);
           var results = simulateTextInput(component, 'john');
 
-          var node = component._entry;
+          var node = component.refs.entry;
           TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_DOWN });
           TestUtils.Simulate.keyDown(node, { keyCode: Keyevent.DOM_VK_RETURN });
 
@@ -583,7 +605,7 @@ describe('Typeahead Component', function() {
 
     context('customListComponent', function() {
       before(function() {
-        ListComponent = React.createClass({
+        ListComponent = createReactClass({
           render: function() {
             return <div></div>;
           }
@@ -607,7 +629,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should show the customListComponent when the input is not empty', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "o";
         TestUtils.Simulate.change(input);
         var results = TestUtils.scryRenderedComponentsWithType(this.component, this.ListComponent);
@@ -615,7 +637,7 @@ describe('Typeahead Component', function() {
       });
 
       it('should no longer show the customListComponent after an option has been selected', function() {
-        var input = this.component._entry;
+        var input = this.component.refs.entry;
         input.value = "o";
         TestUtils.Simulate.change(input);
         TestUtils.Simulate.keyDown(input, { keyCode: Keyevent.DOM_VK_TAB });
@@ -631,7 +653,7 @@ describe('Typeahead Component', function() {
           textarea={ true }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         assert.equal(input.tagName.toLowerCase(), 'textarea');
       });
 
@@ -640,7 +662,7 @@ describe('Typeahead Component', function() {
           options={ BEATLES }
         />);
 
-        var input = component._entry;
+        var input = component.refs.entry;
         assert.equal(input.tagName.toLowerCase(), 'input');
       });
     });
@@ -677,7 +699,7 @@ describe('Typeahead Component', function() {
           />
         );
 
-        TestUtils.Simulate.focus(component._entry);
+        TestUtils.Simulate.focus(component.refs.entry);
         var results = TestUtils.scryRenderedComponentsWithType(component, TypeaheadOption);
         assert.equal(4, results.length);
       });

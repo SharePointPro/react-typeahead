@@ -1,6 +1,6 @@
 {
-  "name": "react-typeahead",
-  "version": "2.0.0-alpha.7",
+  "name": "react-typeahead-sppro",
+  "version": "2.0.4",
   "description": "React-based typeahead and typeahead-tokenizer",
   "keywords": [
     "react",
@@ -15,21 +15,13 @@
     "email": "ruibalp@gmail.com"
   },
   "license": "ISC",
-  "author": {
-    "name": "Peter Ruibal",
-    "email": "ruibalp@gmail.com",
-    "url": "https://github.com/fmoo"
-  },
+  "author": "Peter Ruibal <ruibalp@gmail.com> (https://github.com/fmoo)",
   "contributors": [
-    {
-      "name": "Sam Breed",
-      "email": "sam@quickleft.com",
-      "url": "http://wookiehangover.com"
-    }
+    "Sam Breed <sam@quickleft.com> (http://wookiehangover.com)"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/fmoo/react-typeahead.git"
+    "url": "git+https://github.com/fmoo/react-typeahead.git"
   },
   "dependencies": {
     "classnames": "^1.2.0",
@@ -73,5 +65,9 @@
   },
   "literalify": {
     "react": "window.React || require('react')"
+  },
+  "directories": {
+    "example": "examples",
+    "test": "test"
   }
 }

@@ -1,16 +1,18 @@
 var React = require('react');
 var classNames = require('classnames');
+var createReactClass = require('create-react-class');
+var PropTypes = require('prop-types');
 
 /**
  * A single option within the TypeaheadSelector
  */
-var TypeaheadOption = React.createClass({
+var TypeaheadOption = createReactClass({
   propTypes: {
-    customClasses: React.PropTypes.object,
-    customValue: React.PropTypes.string,
-    onClick: React.PropTypes.func,
-    children: React.PropTypes.string,
-    hover: React.PropTypes.bool
+    customClasses: PropTypes.object,
+    customValue: PropTypes.string,
+    onClick: PropTypes.func,
+    children: PropTypes.string,
+    hover: PropTypes.bool
   },
 
   getDefaultProps: function() {
@@ -33,11 +35,14 @@ var TypeaheadOption = React.createClass({
 
     var classList = classNames(classes);
 
+    // For some reason onClick is not fired when clicked on an option
+    // onMouseDown is used here as a workaround of #205 and other
+    // related tickets
     return (
-      <li className={classList} onClick={this._onClick}>
-        <a href="javascript: void 0;" className={this._getClasses()}>
+      <li className={classList} onClick={this._onClick} onMouseDown={this._onClick} style={{cursor: "pointer"}}>
+        <span  className={this._getClasses()}>
           { this.props.children }
-        </a>
+        </span>
       </li>
     );
   },
