@@ -4,8 +4,6 @@ var Token = require('./token');
 var KeyEvent = require('../keyevent');
 var Typeahead = require('../typeahead');
 var classNames = require('classnames');
-var createReactClass = require('create-react-class');
-var PropTypes = require('prop-types');
 
 function _arraysAreDifferent(array1, array2) {
   if (array1.length != array2.length){
@@ -23,41 +21,40 @@ function _arraysAreDifferent(array1, array2) {
  * the text entry widget, prepends a renderable "token", that may be deleted
  * by pressing backspace on the beginning of the line with the keyboard.
  */
-var TypeaheadTokenizer = createReactClass({
+var TypeaheadTokenizer = React.createClass({
   propTypes: {
-    name: PropTypes.string,
-    options: PropTypes.array,
-    customClasses: PropTypes.object,
-    allowCustomValues: PropTypes.number,
-    defaultSelected: PropTypes.array,
-    initialValue: PropTypes.string,
-    placeholder: PropTypes.string,
-    disabled: PropTypes.bool,
-    inputProps: PropTypes.object,
-    onTokenRemove: PropTypes.func,
-    onKeyDown: PropTypes.func,
-    onKeyPress: PropTypes.func,
-    onKeyUp: PropTypes.func,
-    onTokenAdd: PropTypes.func,
-    onFocus: PropTypes.func,
-    onBlur: PropTypes.func,
-    filterOption: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func
+    name: React.PropTypes.string,
+    options: React.PropTypes.array,
+    customClasses: React.PropTypes.object,
+    allowCustomValues: React.PropTypes.number,
+    defaultSelected: React.PropTypes.array,
+    initialValue: React.PropTypes.string,
+    placeholder: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    inputProps: React.PropTypes.object,
+    onTokenRemove: React.PropTypes.func,
+    onKeyDown: React.PropTypes.func,
+    onKeyPress: React.PropTypes.func,
+    onKeyUp: React.PropTypes.func,
+    onTokenAdd: React.PropTypes.func,
+    onFocus: React.PropTypes.func,
+    onBlur: React.PropTypes.func,
+    filterOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
     ]),
-    searchOptions: PropTypes.func,
-    displayOption: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func
+    searchOptions: React.PropTypes.func,
+    displayOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
     ]),
-    formInputOption: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func
+    formInputOption: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.func
     ]),
-    maxVisible: PropTypes.number,
-    resultsTruncatedMessage: PropTypes.string,
-    defaultClassNames: PropTypes.bool,
-    showOptionsWhenEmpty: PropTypes.bool,
+    maxVisible: React.PropTypes.number,
+    resultsTruncatedMessage: React.PropTypes.string,
+    defaultClassNames: React.PropTypes.bool
   },
 
   getInitialState: function() {
@@ -89,8 +86,7 @@ var TypeaheadTokenizer = createReactClass({
       onFocus: function(event) {},
       onBlur: function(event) {},
       onTokenAdd: function() {},
-      onTokenRemove: function() {},
-      showOptionsWhenEmpty: false,
+      onTokenRemove: function() {}
     };
   },
 
@@ -102,7 +98,7 @@ var TypeaheadTokenizer = createReactClass({
   },
 
   focus: function(){
-    this.refs.typeahead.focus();
+    this._typeahead.focus();
   },
 
   getSelectedTokens: function(){
@@ -152,7 +148,7 @@ var TypeaheadTokenizer = createReactClass({
 
     // Remove token ONLY when bksp pressed at beginning of line
     // without a selection
-    var entry = this.refs.typeahead.refs.entry;
+    var entry = this._typeahead._entry;
     if (entry.selectionStart == entry.selectionEnd &&
         entry.selectionStart == 0) {
       this._removeTokenForValue(
@@ -179,7 +175,7 @@ var TypeaheadTokenizer = createReactClass({
     }
     this.state.selected.push(value);
     this.setState({selected: this.state.selected});
-    this.refs.typeahead.setEntryText("");
+    this._typeahead.setEntryText("");
     this.props.onTokenAdd(value);
   },
 
@@ -191,10 +187,13 @@ var TypeaheadTokenizer = createReactClass({
     tokenizerClasses[this.props.className] = !!this.props.className;
     var tokenizerClassList = classNames(tokenizerClasses)
 
+    var _this = this;
+    var typeaheadRef = function(c){_this._typeahead = c};
+
     return (
       <div className={tokenizerClassList}>
         { this._renderTokens() }
-        <Typeahead ref="typeahead"
+        <Typeahead ref={typeaheadRef}
           className={classList}
           placeholder={this.props.placeholder}
           disabled={this.props.disabled}
@@ -214,8 +213,7 @@ var TypeaheadTokenizer = createReactClass({
           displayOption={this.props.displayOption}
           defaultClassNames={this.props.defaultClassNames}
           filterOption={this.props.filterOption}
-          searchOptions={this.props.searchOptions}
-          showOptionsWhenEmpty={this.props.showOptionsWhenEmpty} />
+          searchOptions={this.props.searchOptions} />
       </div>
     );
   }

@@ -1,25 +1,23 @@
 var React = require('react');
 var TypeaheadOption = require('./option');
 var classNames = require('classnames');
-var createReactClass = require('create-react-class');
-var PropTypes = require('prop-types');
 
 /**
  * Container for the options rendered as part of the autocompletion process
  * of the typeahead
  */
-var TypeaheadSelector = createReactClass({
+var TypeaheadSelector = React.createClass({
   propTypes: {
-    options: PropTypes.array,
-    allowCustomValues: PropTypes.number,
-    customClasses: PropTypes.object,
-    customValue: PropTypes.string,
-    selectionIndex: PropTypes.number,
-    onOptionSelected: PropTypes.func,
-    displayOption: PropTypes.func.isRequired,
-    defaultClassNames: PropTypes.bool,
-    areResultsTruncated: PropTypes.bool,
-    resultsTruncatedMessage: PropTypes.string
+    options: React.PropTypes.array,
+    allowCustomValues: React.PropTypes.number,
+    customClasses: React.PropTypes.object,
+    customValue: React.PropTypes.string,
+    selectionIndex: React.PropTypes.number,
+    onOptionSelected: React.PropTypes.func,
+    displayOption: React.PropTypes.func.isRequired,
+    defaultClassNames: React.PropTypes.bool,
+    areResultsTruncated: React.PropTypes.bool,
+    resultsTruncatedMessage: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -51,7 +49,7 @@ var TypeaheadSelector = createReactClass({
     if (this.props.customValue !== null) {
       customValueOffset++;
       customValue = (
-        <TypeaheadOption ref={this.props.customValue} key={this.props.customValue}
+        <TypeaheadOption key={this.props.customValue}
           hover={this.props.selectionIndex === 0}
           customClasses={this.props.customClasses}
           customValue={this.props.customValue}
@@ -65,7 +63,7 @@ var TypeaheadSelector = createReactClass({
       var displayString = this.props.displayOption(result, i);
       var uniqueKey = displayString + '_' + i;
       return (
-        <TypeaheadOption ref={uniqueKey} key={uniqueKey}
+        <TypeaheadOption key={uniqueKey}
           hover={this.props.selectionIndex === i + customValueOffset}
           customClasses={this.props.customClasses}
           onClick={this._onClick.bind(this, result)}>
